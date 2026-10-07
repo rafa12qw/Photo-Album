@@ -42,9 +42,11 @@ Available routes:
 - `PATCH /api/albums/:albumId/photos/order` with `{ "photoIds": ["..."] }`
 
 Photo endpoints store photo metadata in PostgreSQL and the original binary on
-the backend filesystem under `uploads/users/<userId>/photos/`. Files are served at `/uploads/...`,
-and the API includes a public `url` for each stored photo. The upload route is
-limited to 10 MB and supports adding, replacing, and deleting photos.
+the backend filesystem under `uploads/users/<userId>/photos/` in local mode.
+For Render, set `UPLOAD_PROVIDER=cloudinary` and provide the Cloudinary
+credentials; the API then returns persistent Cloudinary URLs for each photo.
+The upload route is limited to 10 MB and supports adding, replacing, and
+deleting photos.
 
 ## Project setup
 
