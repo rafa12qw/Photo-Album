@@ -33,7 +33,7 @@ export type BookPageProps = {
   selectedPhotoId: string | null;
   photoAt: (index: number) => string;
     photoCaption: string | null;
-    onSaveCaption: (caption: string) => Promise<void>;
+    onSaveCaption: (photoId: string, caption: string) => Promise<void>;
   onBack: () => void;
   onTurnPage: (next: boolean) => void;
   onSelectPhoto: (photoId: string | null) => void;

@@ -16,7 +16,9 @@ export function AlbumBook(props: BookPageProps) {
 
   async function saveCaption(event: React.FormEvent) {
     event.preventDefault();
-    await onSaveCaption(captionDraft.trim());
+    const photoId = albumPhotos[page * 3]?.photo.id;
+    if (!photoId) return;
+    await onSaveCaption(photoId, captionDraft.trim());
     setEditingCaption(false);
   }
   return (

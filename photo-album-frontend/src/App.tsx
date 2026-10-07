@@ -126,11 +126,11 @@ function App() {
     catch (reason) { setError(reason instanceof Error ? reason.message : 'Unable to erase this photograph.'); }
   }
 
-  async function saveCaption(caption: string) {
-    if (!selectedAlbum || !selectedPhotoId) return;
+  async function saveCaption(photoId: string, caption: string) {
+    if (!selectedAlbum) return;
     try {
-      await updatePhotoCaption(selectedAlbum.id, selectedPhotoId, caption);
-      setAlbumPhotos((current) => current.map((link) => link.photo.id === selectedPhotoId ? { ...link, photo: { ...link.photo, caption } } : link));
+      await updatePhotoCaption(selectedAlbum.id, photoId, caption);
+      setAlbumPhotos((current) => current.map((link) => link.photo.id === photoId ? { ...link, photo: { ...link.photo, caption } } : link));
     } catch (reason) { setError(reason instanceof Error ? reason.message : 'Unable to update caption.'); }
   }
 
