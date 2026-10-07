@@ -34,14 +34,17 @@ run the Prisma migration before starting Nest.
 Available routes:
 
 - `POST /api/users`, `GET /api/users`
-- `POST /api/albums`, `GET /api/albums?ownerId=<uuid>`
+- `POST /api/albums`, `GET /api/albums?ownerId=<uuid>&page=1&limit=20`
 - `GET/PATCH/DELETE /api/albums/:albumId`
 - `POST /api/albums/:albumId/photos`
+- `POST /api/albums/:albumId/photos/upload` with multipart field `file`
 - `DELETE /api/albums/:albumId/photos/:photoId`
 - `PATCH /api/albums/:albumId/photos/order` with `{ "photoIds": ["..."] }`
 
-Photo endpoints store photo metadata and object-storage keys. Uploading the
-binary to MinIO/S3 can be connected to `originalKey` and `thumbnailKey`.
+Photo endpoints store photo metadata in PostgreSQL and the original binary on
+the backend filesystem under `uploads/users/<userId>/photos/`. Files are served at `/uploads/...`,
+and the API includes a public `url` for each stored photo. The upload route is
+limited to 10 MB and supports adding, replacing, and deleting photos.
 
 ## Project setup
 

@@ -7,11 +7,14 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  albums    Album[]
+  id              String        @id @default(uuid())
+  email           String        @unique
+  passwordHash    String
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  albums          Album[]
+  memberships     AlbumMember[]
+  comments        Comment[]
 }
 
 model Album {
@@ -22,6 +25,8 @@ model Album {
   updatedAt DateTime    @updatedAt
   owner     User        @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   photos    AlbumPhoto[]
+  members   AlbumMember[]
+  comments  Comment[]
 
   @@index([ownerId])
 }
@@ -31,12 +36,14 @@ model Photo {
   originalKey  String
   thumbnailKey String?
   filename     String
+  caption      String?
   contentType  String
   sizeBytes    Int
   width        Int?
   height       Int?
   createdAt    DateTime    @default(now())
   albums       AlbumPhoto[]
+  comments     Comment[]
 }
 
 model AlbumPhoto {
@@ -48,4 +55,38 @@ model AlbumPhoto {
 
   @@id([albumId, photoId])
   @@index([photoId])
+}
+
+enum AlbumRole {
+  OWNER
+  EDITOR
+  VIEWER
+}
+
+model AlbumMember {
+  albumId   String
+  userId    String
+  role      AlbumRole @default(VIEWER)
+  createdAt DateTime  @default(now())
+  album     Album    @relation(fields: [albumId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([albumId, userId])
+  @@index([userId])
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  body      String
+  albumId   String
+  photoId   String
+  authorId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  album     Album    @relation(fields: [albumId], references: [id], onDelete: Cascade)
+  photo     Photo    @relation(fields: [photoId], references: [id], onDelete: Cascade)
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([photoId, createdAt])
+  @@index([albumId])
 }
