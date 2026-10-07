@@ -1,26 +1,31 @@
 import { ArrowLeft, ArrowRight, BookOpen, Heart, ImagePlus, MessageCircle, MoreHorizontal, Users } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import type { ApiAlbumPhoto } from '../api';
 import type { BookPageProps } from '../types';
+
+function PhotoCaptionEditor({ photo, onSave }: { photo: ApiAlbumPhoto; onSave: (photoId: string, caption: string) => Promise<void> }) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(photo.photo.caption ?? '');
+
+  useEffect(() => setDraft(photo.photo.caption ?? ''), [photo.photo.caption]);
+
+  async function save(event: React.FormEvent) {
+    event.preventDefault();
+    await onSave(photo.photo.id, draft.trim());
+    setEditing(false);
+  }
+
+  return editing ? <form className="photo-caption-form" onSubmit={save}><input value={draft} onChange={(event) => setDraft(event.target.value)} placeholder="Write a caption..." maxLength={500} /><button type="submit">Save</button></form> : <div className="photo-caption-text"><span>{photo.photo.caption ?? 'Add a caption'}</span><button onClick={() => setEditing(true)}>Edit</button></div>;
+}
 
 export function AlbumBook(props: BookPageProps) {
   const {
     selectedAlbum, albumPhotos, page, totalPages, direction, showLibrary, selectedPhotoId,
     photoAt, onBack, onTurnPage, onSelectPhoto, onComments, onMembers, onMovePhoto,
     onErasePhoto, onReplacePhoto, onAddPhoto,
-    photoCaption, onSaveCaption,
+    onSaveCaption,
   } = props;
 
-  const [editingCaption, setEditingCaption] = useState(false);
-  const [captionDraft, setCaptionDraft] = useState(photoCaption ?? '');
-  useEffect(() => setCaptionDraft(photoCaption ?? ''), [photoCaption]);
-
-  async function saveCaption(event: React.FormEvent) {
-    event.preventDefault();
-    const photoId = albumPhotos[page * 3]?.photo.id;
-    if (!photoId) return;
-    await onSaveCaption(photoId, captionDraft.trim());
-    setEditingCaption(false);
-  }
   return (
     <section className={`book-section ${showLibrary ? 'library-open' : ''}`}>
       <div className="book-heading">
@@ -38,13 +43,13 @@ export function AlbumBook(props: BookPageProps) {
             <div className={`photo-frame large-photo ${selectedPhotoId === albumPhotos[page * 3]?.photo.id ? 'photo-selected' : ''}`} onClick={() => onSelectPhoto(albumPhotos[page * 3]?.photo.id ?? null)}>
               <img src={photoAt(page * 3)} alt={albumPhotos[page * 3]?.photo.filename ?? 'A photograph from this album'} />
             </div>
-            <div className="caption-block"><span>{page * 3 + 1} / {albumPhotos.length || selectedAlbum.count}</span>{editingCaption ? <form className="caption-edit-form" onSubmit={saveCaption}><input value={captionDraft} onChange={(event) => setCaptionDraft(event.target.value)} placeholder="Write a caption..." maxLength={500} /><button type="submit">Save</button></form> : <><p>{photoCaption ?? 'Add a caption to this photograph.'}</p><button className="comment-edit-button" onClick={() => setEditingCaption(true)}>Edit caption</button></>}</div>
+            <div className="caption-block"><span>{page * 3 + 1} / {albumPhotos.length || selectedAlbum.count}</span>{albumPhotos[page * 3] && <PhotoCaptionEditor photo={albumPhotos[page * 3]} onSave={onSaveCaption} />}</div>
           </article>
           <div className="book-gutter" />
           <article className="paper-page page-right">
             <div className="page-number">{page * 3 + 2}</div>
             <div className="photo-grid">
-              {[1, 2].map((offset) => <div className={`photo-frame ${selectedPhotoId === albumPhotos[page * 3 + offset]?.photo.id ? 'photo-selected' : ''}`} key={offset} onClick={() => onSelectPhoto(albumPhotos[page * 3 + offset]?.photo.id ?? null)}><img src={photoAt(page * 3 + offset)} alt="Album photograph" /></div>)}
+              {[1, 2].map((offset) => <div className={`photo-frame ${selectedPhotoId === albumPhotos[page * 3 + offset]?.photo.id ? 'photo-selected' : ''}`} key={offset} onClick={() => onSelectPhoto(albumPhotos[page * 3 + offset]?.photo.id ?? null)}><img src={photoAt(page * 3 + offset)} alt="Album photograph" />{albumPhotos[page * 3 + offset] && <PhotoCaptionEditor photo={albumPhotos[page * 3 + offset]} onSave={onSaveCaption} />}</div>)}
             </div>
             <div className="caption-block aligned-right"><span>FOLIO / {page + 1}</span><p>Postcards we never had to send.</p></div>
           </article>

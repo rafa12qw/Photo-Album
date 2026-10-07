@@ -99,6 +99,11 @@ h2 span { color: var(--muted); font: 400 12px 'DM Mono', monospace; vertical-ali
 .photo-frame img { display: block; width: 100%; height: 100%; object-fit: cover; filter: saturate(.85) sepia(.08); transition: transform .5s ease; }
 .photo-frame { cursor: pointer; }
 .photo-frame.photo-selected { outline: 3px solid var(--rust); outline-offset: 5px; }
+.photo-caption-text { position: absolute; right: 0; bottom: 0; left: 0; display: flex; align-items: center; justify-content: space-between; gap: 7px; padding: 7px 9px; color: #fff; background: rgba(41,35,31,.78); font: 11px 'Playfair Display', serif; }
+.photo-caption-text span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.photo-caption-text button, .photo-caption-form button { flex: 0 0 auto; border: 0; color: #fff; background: transparent; font-size: 10px; text-decoration: underline; }
+.photo-caption-form { position: absolute; right: 0; bottom: 0; left: 0; display: flex; gap: 5px; padding: 6px; background: rgba(41,35,31,.88); }
+.photo-caption-form input { min-width: 0; flex: 1; border: 0; padding: 5px 6px; background: #f4f0e8; font-size: 11px; }
 .photo-frame:hover img { transform: scale(1.04); }
 .large-photo { height: 360px; margin-top: 20px; transform: rotate(-1.2deg); box-shadow: 5px 7px 0 rgba(62,47,34,.12); }
 .photo-grid { display: grid; gap: 22px; margin-top: 20px; }

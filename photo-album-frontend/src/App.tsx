@@ -24,7 +24,6 @@ function App() {
   const [albums, setAlbums] = useState<Album[]>([]);
   const [selectedAlbum, setSelectedAlbum] = useState<Album | null>(null);
   const [albumPhotos, setAlbumPhotos] = useState<ApiAlbumPhoto[]>([]);
-  const [photoCaption, setPhotoCaption] = useState<string | null>(null);
   const [selectedPhotoId, setSelectedPhotoId] = useState<string | null>(null);
   const [page, setPage] = useState(0);
   const [direction, setDirection] = useState<'next' | 'previous'>('next');
@@ -66,10 +65,6 @@ function App() {
     setLoading(true);
     loadAlbums(user.id).catch((reason: unknown) => setError(reason instanceof Error ? reason.message : 'Unable to connect to the album API.')).finally(() => setLoading(false));
   }, [user]);
-
-  useEffect(() => {
-    setPhotoCaption(albumPhotos[page * 3]?.photo.caption ?? null);
-  }, [albumPhotos, page]);
 
   if (!user) return <AuthScreen onAuthenticated={setUser} />;
   const currentUser = user;
@@ -169,7 +164,7 @@ function App() {
       {loading && <div className="loading-note">Opening your shelf...</div>}
       {showNewAlbum && <form className="new-album-form" onSubmit={submitAlbum}><label htmlFor="album-name">Name your new album</label><div><input id="album-name" autoFocus value={newAlbumName} onChange={(event) => setNewAlbumName(event.target.value)} placeholder="A year in places" maxLength={120} /><button type="submit">Create</button><button type="button" className="cancel-button" onClick={() => setShowNewAlbum(false)}>Cancel</button></div></form>}
       {showLibrary && <AlbumShelf albums={albums} selectedAlbum={selectedAlbum} onSelect={(album) => void selectAlbum(album)} onCreate={() => setShowNewAlbum(true)} />}
-      {selectedAlbum ? <AlbumBook selectedAlbum={selectedAlbum} albumPhotos={albumPhotos} page={page} totalPages={totalPages} direction={direction} showLibrary={showLibrary} selectedPhotoId={selectedPhotoId} photoAt={photoAt} photoCaption={photoCaption} onSaveCaption={saveCaption} onBack={() => setShowLibrary(true)} onTurnPage={turnPage} onSelectPhoto={setSelectedPhotoId} onComments={() => void openComments()} onMembers={() => void openMembers()} onMovePhoto={(delta) => void movePhoto(delta)} onErasePhoto={() => void erasePhoto()} onReplacePhoto={() => chooseUpload('replace')} onAddPhoto={() => chooseUpload('add')} /> : <EmptyBook onCreate={() => setShowNewAlbum(true)} />}
+      {selectedAlbum ? <AlbumBook selectedAlbum={selectedAlbum} albumPhotos={albumPhotos} page={page} totalPages={totalPages} direction={direction} showLibrary={showLibrary} selectedPhotoId={selectedPhotoId} photoAt={photoAt} onSaveCaption={saveCaption} onBack={() => setShowLibrary(true)} onTurnPage={turnPage} onSelectPhoto={setSelectedPhotoId} onComments={() => void openComments()} onMembers={() => void openMembers()} onMovePhoto={(delta) => void movePhoto(delta)} onErasePhoto={() => void erasePhoto()} onReplacePhoto={() => chooseUpload('replace')} onAddPhoto={() => chooseUpload('add')} /> : <EmptyBook onCreate={() => setShowNewAlbum(true)} />}
       <input ref={fileInputRef} className="visually-hidden" type="file" accept="image/*" onChange={handleUpload} />
       {panel && <AlbumSidePanel panel={panel} comments={comments} members={members} onClose={() => setPanel(null)} onSubmitComment={submitComment} onEditComment={editComment} memberEmail={memberEmail} memberRole={memberRole} onMemberEmailChange={setMemberEmail} onMemberRoleChange={setMemberRole} onInvite={inviteMember} />}
       <section className="quick-actions"><button><Camera size={19} /><span>Capture a moment</span><ArrowRight size={16} /></button><button><Grid2X2 size={19} /><span>Browse all memories</span><ArrowRight size={16} /></button><button onClick={() => chooseUpload('add')}><Upload size={19} /><span>Import from camera roll</span><ArrowRight size={16} /></button></section>
